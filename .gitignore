@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+
+# Large model files
+models/biobert_prescription/pytorch_model.bin
+models/
+
+# Raw data
+data/raw_images/
+data/custom_indian/train.conll
+data/custom_indian/dev.conll
+data/custom_indian/test.conll
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
