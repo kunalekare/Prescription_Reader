@@ -1,0 +1,11 @@
+{
+  "0": "O",
+  "1": "B-FORM",
+  "2": "B-DRUG_BRAND",
+  "3": "B-DRUG_GENERIC",
+  "4": "B-DOSAGE",
+  "5": "I-DOSAGE",
+  "6": "B-FREQUENCY",
+  "7": "B-DURATION",
+  "8": "I-DURATION"
+}
