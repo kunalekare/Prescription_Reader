@@ -170,25 +170,4 @@ Contributions are welcome!
 
 ---
 
-## 📜 License
 
-This project is for educational and research purposes.
-
----
-
-⭐ If you found this project useful, consider giving it a star!
-
-```
-
----
-
-If you want, I can now:
-
-- Make it **industry-level professional**
-- Add **badges (build status, Python version, license, etc.)**
-- Add **sample output images**
-- Add **API documentation section**
-- Convert this into a **research paper format**
-
-Tell me which version you want next 👌
-```
