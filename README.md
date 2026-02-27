@@ -30,22 +30,17 @@ This system can be used in:
 ---
 
 ## 🏗️ Project Architecture
-
-```
-
 Input Image
-↓
+    ↓
 Image Preprocessing
-↓
+    ↓
 OCR Engine (Text Extraction)
-↓
+    ↓
 Text Cleaning & NLP Processing
-↓
+    ↓
 Medicine / Dosage Extraction
-↓
+    ↓
 Structured Output (JSON / CSV)
-
-```
 
 ---
 
@@ -169,5 +164,6 @@ Contributions are welcome!
 4. Submit Pull Request
 
 ---
+
 
 
