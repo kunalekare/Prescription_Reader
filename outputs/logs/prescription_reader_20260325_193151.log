@@ -1,0 +1,24 @@
+2026-03-25 19:31:52,315 - src.ocr.sarvam_ocr - INFO - Processing image: temp_uploads\IMG-20260122-WA0017.jpg
+2026-03-25 19:31:55,546 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_6011173f-2810-439e-8022-00570e85c7f1"}}
+2026-03-25 19:32:00,376 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_1c7686d1-09f2-462d-9e0c-c1ec75df8c70"}}
+2026-03-25 19:32:03,984 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_f4813a79-830c-4379-b60a-8f9a0495d17b"}}
+2026-03-25 19:32:26,447 - src.ocr.sarvam_ocr - INFO - Processing image: temp_uploads\IMG-20260122-WA0017.jpg
+2026-03-25 19:32:28,054 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_5283512f-5dec-4ded-8550-2f1866f8fc88"}}
+2026-03-25 19:32:31,353 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_69542d28-f9e5-46a3-abf7-11f70f701b51"}}
+2026-03-25 19:32:34,109 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_27013d5a-cd5f-49a4-941d-8ffe2feea914"}}
+2026-03-25 19:36:31,876 - src.ocr.sarvam_ocr - INFO - Processing image: temp_uploads\IMG-20260122-WA0017.jpg
+2026-03-25 19:36:35,132 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_7184b067-10ca-4174-8117-c8bb469f30df"}}
+2026-03-25 19:36:39,128 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_bab70d2a-a0ba-4e4c-bbd3-83884767710a"}}
+2026-03-25 19:36:42,012 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_3185ed37-0e34-41ad-9757-349ba721d3c5"}}
+2026-03-25 19:36:49,556 - src.ocr.sarvam_ocr - INFO - Processing image: temp_uploads\IMG-20260122-WA0017.jpg
+2026-03-25 19:36:51,822 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_6f1b4451-4f5f-4e19-970d-cbdcf6e1b818"}}
+2026-03-25 19:36:54,980 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_edc4025c-90b4-4b67-b445-caa4bef56bb2"}}
+2026-03-25 19:36:58,444 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_b1c929fc-b2d7-4fff-a367-2972c9508b65"}}
+2026-03-25 19:41:05,063 - src.ocr.sarvam_ocr - INFO - Processing image: temp_uploads\IMG-20260122-WA0030.jpg
+2026-03-25 19:41:06,872 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_5d0f29ce-98cd-4f6f-b4bc-b7406e9dcd2c"}}
+2026-03-25 19:41:09,703 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_5f85ff43-d9ae-45a3-9b30-6d0830d7d971"}}
+2026-03-25 19:41:13,157 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_75a27d76-0165-44c6-8b8f-3fb9f7169871"}}
+2026-03-25 19:42:50,205 - src.ocr.sarvam_ocr - INFO - Processing image: temp_uploads\IMG-20260122-WA0017.jpg
+2026-03-25 19:42:51,943 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_9d3e6ee8-8b9e-4d2f-bfa4-0da1e4215b59"}}
+2026-03-25 19:42:54,471 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_70b3ed10-ebc0-4c52-8d85-d94fe5a26620"}}
+2026-03-25 19:42:57,059 - src.ocr.sarvam_ocr - ERROR - OCR API returned status 404: {"error":{"message":"Not Found","code":"not_found_error","request_id":"20260325_2b97bf70-4cea-4fc4-8722-060fd51b73b7"}}
