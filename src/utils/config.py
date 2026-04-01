@@ -91,8 +91,12 @@ class OCRConfig:
     
     def __post_init__(self):
         """Validate API key is present."""
+        import logging as _logging
         if not self.api_key:
-            raise ValueError("SARVAM_API_KEY not found in environment variables")
+            _logging.getLogger(__name__).warning(
+                "SARVAM_API_KEY not found in environment variables. "
+                "OCR features will be unavailable."
+            )
 
 
 @dataclass
@@ -100,33 +104,36 @@ class ModelConfig:
     """Configuration for NER model settings."""
     
     # Pre-trained model
-    pretrained_model_name: str = "dmis-lab/biobert-base-cased-v1.2"
+    pretrained_model_name: str = "emilyalsentzer/Bio_ClinicalBERT"
     
     # Training hyperparameters
-    learning_rate: float = 2e-5
-    num_epochs: int = 10
-    batch_size: int = 16
-    max_length: int = 128
-    warmup_steps: int = 500
+    learning_rate: float = 3e-5          # Good default for clinical BERT fine-tuning
+    num_epochs: int = 15                 # More epochs — Colab GPU can handle it
+    batch_size: int = 32                 # Larger batch for Colab T4/A100 GPU
+    max_length: int = 256                # Avoids truncating long prescriptions
+    warmup_steps: int = 100              # ~5-10% of total steps
     weight_decay: float = 0.01
     gradient_accumulation_steps: int = 1
-    
+
+    # Mixed precision (fp16) — set True for Colab GPU (T4/A100), False for CPU
+    fp16: bool = True
+
     # Optimization
     adam_epsilon: float = 1e-8
     max_grad_norm: float = 1.0
-    
+
     # Early stopping
-    early_stopping_patience: int = 3
-    early_stopping_delta: float = 0.001
-    
+    early_stopping_patience: int = 5     # Gives model room to recover
+    early_stopping_delta: float = 0.0001 # Less aggressive threshold
+
     # Validation
     eval_steps: int = 100
     save_steps: int = 500
     logging_steps: int = 50
-    
-    # Device
-    device: str = "cuda" if os.getenv("USE_CUDA", "auto") == "auto" else "cpu"
-    
+
+    # Device — auto-detected at runtime (cuda if available, else cpu)
+    device: str = "auto"
+
     # Random seed for reproducibility
     random_seed: int = 42
 

@@ -43,6 +43,13 @@ def clean_text(text: Optional[str], strict: bool = False) -> str:
         # Convert to string if not already
         text = str(text)
         
+        # Remove HTML tags (like <table>, <tbody>, etc. returned by OCR)
+        text = re.sub(r'<[^>]+>', ' ', text)
+        
+        # Remove Markdown table characters (| and -) if any
+        text = re.sub(r'\|', ' ', text)
+        text = re.sub(r'---+', ' ', text)
+        
         # Replace newlines with spaces
         text = text.replace("\n", " ").replace("\r", " ")
         

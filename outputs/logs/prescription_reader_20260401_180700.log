@@ -1,0 +1,11 @@
+2026-04-01 18:07:31,771 - src.ocr.sarvam_ocr - INFO - Processing image with Sarvam Document Intelligence: temp_uploads\1000153614.jpg
+2026-04-01 18:07:31,809 - src.ocr.sarvam_ocr - INFO - Creating document intelligence job (language: hi-IN)
+2026-04-01 18:07:32,514 - src.ocr.sarvam_ocr - INFO - Job created: 20260401_eb5d3874-ff05-4d4c-b557-ccc2f3c2913b
+2026-04-01 18:07:32,515 - src.ocr.sarvam_ocr - INFO - Uploading file: 1000153614.jpg
+2026-04-01 18:07:32,796 - src.ocr.sarvam_ocr - INFO - File uploaded successfully
+2026-04-01 18:07:32,796 - src.ocr.sarvam_ocr - INFO - Starting job processing...
+2026-04-01 18:07:32,986 - src.ocr.sarvam_ocr - INFO - Waiting for job completion...
+2026-04-01 18:07:35,126 - src.ocr.sarvam_ocr - INFO - Job completed in 2.14s with state: Completed
+2026-04-01 18:07:35,128 - src.ocr.sarvam_ocr - INFO - Downloading output to: C:\Users\HP\AppData\Local\Temp\tmppnio4vd3\output.zip
+2026-04-01 18:07:35,423 - src.ocr.sarvam_ocr - INFO - Reading extracted text from: document.md
+2026-04-01 18:07:35,468 - src.ocr.sarvam_ocr - INFO - Successfully extracted 226 characters

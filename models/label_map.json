@@ -7,5 +7,9 @@
   "I-DOSAGE": 5,
   "B-FREQUENCY": 6,
   "B-DURATION": 7,
-  "I-DURATION": 8
+  "I-DURATION": 8,
+  "I-FREQUENCY": 9,
+  "I-DRUG_GENERIC": 10,
+  "B-TIMING": 11,
+  "I-TIMING": 12
 }

@@ -232,6 +232,7 @@ def display_results(result: dict):
         st.subheader("🎯 Extracted Entities")
         
         entities = result.get("entities", {})
+        drug_descriptions = result.get("drug_descriptions", {})
         
         if not entities:
             st.warning("No entities found in the prescription.")
@@ -239,6 +240,15 @@ def display_results(result: dict):
             for entity_type, values in entities.items():
                 if values:
                     display_entity_card(entity_type, values)
+                    
+                    if entity_type in ["DRUG_BRAND", "DRUG_GENERIC", "DRUG"]:
+                        for val in values:
+                            desc_data = drug_descriptions.get(val)
+                            if desc_data:
+                                root = desc_data.get("root_name", val)
+                                desc = desc_data.get("description", "")
+                                with st.expander(f"💊 What is {val} (Root: {root})?", expanded=False):
+                                    st.write(desc)
             
             # Create DataFrame for table view
             st.subheader("📊 Entity Table")

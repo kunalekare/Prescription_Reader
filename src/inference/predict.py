@@ -13,6 +13,7 @@ from ..preprocessing.text_cleaner import clean_text, TextCleaningError
 from ..utils.config import get_paths, get_model_config, get_inference_config
 from ..utils.logger import get_logger
 from ..utils.file_utils import read_json, file_exists
+from ..utils.drug_info import get_drug_description
 
 logger = get_logger(__name__)
 
@@ -90,7 +91,11 @@ class PrescriptionPredictor:
             self.model.eval()
             
             # Move to device if using GPU
-            device = torch.device(self.model_config.device)
+            if self.model_config.device == "auto":
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            else:
+                device = torch.device(self.model_config.device)
+            
             self.model.to(device)
             
             logger.info(f"Model loaded successfully on {device}")
@@ -159,93 +164,74 @@ class PrescriptionPredictor:
     def extract_entities(self, tokens_with_labels: List[Tuple[str, str, int]]) -> Dict[str, List[str]]:
         """
         Extract and group entities from token-label pairs.
-        
-        Args:
-            tokens_with_labels: List of (token, label, label_id) tuples
-            
-        Returns:
-            Dictionary mapping entity types to list of extracted values
+        Uses robust subword merging logic to handle WordPiece (##) tokens.
         """
         entities = {}
-        current_entity = None
+        current_label = None
         current_tokens = []
         
+        SKIP_TOKENS = {"[CLS]", "[SEP]", "[PAD]"}
+        
         for token, label, _ in tokens_with_labels:
-            # Skip special tokens
-            if token in ['[CLS]', '[SEP]', '[PAD]']:
+            if token in SKIP_TOKENS:
                 continue
-            
-            # Handle BIO tagging
-            if label.startswith('B-'):
-                # Save previous entity
-                if current_entity and current_tokens:
-                    entity_type = current_entity
-                    entity_value = self._merge_tokens(current_tokens)
-                    if entity_type not in entities:
-                        entities[entity_type] = []
-                    entities[entity_type].append(entity_value)
                 
-                # Start new entity
-                current_entity = label[2:]  # Remove 'B-' prefix
+            # Always treat ## tokens as subword continuations of the current word
+            if token.startswith('##'):
+                if current_tokens:
+                    current_tokens.append(token)
+                else:
+                    current_label = label[2:] if label != 'O' else None
+                    current_tokens = [token]
+                continue
+                
+            # Regular (non-##) token
+            if label.startswith('B-'):
+                # Flush previous entity
+                if current_label and current_tokens:
+                    merged_val = self._merge_tokens(current_tokens)
+                    entities.setdefault(current_label, []).append(merged_val)
+                current_label = label[2:]   # strip 'B-'
                 current_tokens = [token]
                 
             elif label.startswith('I-'):
-                # Continue current entity
-                entity_type = label[2:]  # Remove 'I-' prefix
-                if entity_type == current_entity:
+                entity_type = label[2:]
+                if entity_type == current_label:
+                    # Same entity type continues: accumulate into the same span
                     current_tokens.append(token)
                 else:
-                    # Inconsistent tagging, start new entity
-                    if current_entity and current_tokens:
-                        entity_value = self._merge_tokens(current_tokens)
-                        if current_entity not in entities:
-                            entities[current_entity] = []
-                        entities[current_entity].append(entity_value)
-                    current_entity = entity_type
+                    # Mismatched I- tag: save old entity, start new
+                    if current_label and current_tokens:
+                        merged_val = self._merge_tokens(current_tokens)
+                        entities.setdefault(current_label, []).append(merged_val)
+                    current_label = entity_type
                     current_tokens = [token]
                     
-            else:  # 'O' or unknown
-                # Save previous entity
-                if current_entity and current_tokens:
-                    entity_type = current_entity
-                    entity_value = self._merge_tokens(current_tokens)
-                    if entity_type not in entities:
-                        entities[entity_type] = []
-                    entities[entity_type].append(entity_value)
-                current_entity = None
+            else:  # 'O'
+                if current_label and current_tokens:
+                    merged_val = self._merge_tokens(current_tokens)
+                    entities.setdefault(current_label, []).append(merged_val)
+                current_label = None
                 current_tokens = []
-        
-        # Don't forget last entity
-        if current_entity and current_tokens:
-            entity_value = self._merge_tokens(current_tokens)
-            if current_entity not in entities:
-                entities[current_entity] = []
-            entities[current_entity].append(entity_value)
-        
+                
+        # Flush last entity
+        if current_label and current_tokens:
+            merged_val = self._merge_tokens(current_tokens)
+            entities.setdefault(current_label, []).append(merged_val)
+            
         return entities
     
     def _merge_tokens(self, tokens: List[str]) -> str:
-        """
-        Merge subword tokens into complete words.
-        
-        Args:
-            tokens: List of token strings
-            
-        Returns:
-            Merged string
-        """
+        """Merges WordPiece subword tokens back into a full word."""
         if not tokens:
             return ""
-        
-        # Handle BERT wordpiece tokens (##)
-        merged = tokens[0]
-        for token in tokens[1:]:
-            if token.startswith('##'):
-                merged += token[2:]
+        word = tokens[0]
+        for t in tokens[1:]:
+            if t.startswith("##"):
+                word += t[2:]   # "Cro" + "##cin" → "Crocin"
             else:
-                merged += ' ' + token
-        
-        return merged.strip()
+                word += " " + t
+        return word.strip()
 
 
 # Global predictor instance
@@ -312,10 +298,31 @@ def process_prescription(
         logger.info("Step 4: Structuring entities...")
         entities = predictor.extract_entities(token_predictions)
         
+        # Step 5: Fetch drug descriptions
+        logger.info("Step 5: Fetching drug descriptions...")
+        drug_descriptions = {}
+        
+        # Look for any drug entities
+        drug_names = []
+        if "DRUG_BRAND" in entities:
+            drug_names.extend(entities["DRUG_BRAND"])
+        if "DRUG_GENERIC" in entities:
+            drug_names.extend(entities["DRUG_GENERIC"])
+        if "DRUG" in entities: # Fallback just in case
+            drug_names.extend(entities["DRUG"])
+            
+        # Remove duplicates
+        unique_drugs = list(set(drug_names))
+        
+        for drug in unique_drugs:
+            if drug.strip():
+                drug_descriptions[drug] = get_drug_description(drug)
+        
         result = {
             "raw_text": raw_text,
             "cleaned_text": cleaned_text,
             "entities": entities,
+            "drug_descriptions": drug_descriptions,
             "success": True
         }
         

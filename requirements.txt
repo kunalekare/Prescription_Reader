@@ -23,6 +23,9 @@ streamlit
 pytest
 pytest-cov
 
+# Features
+wikipedia
+
 # Development
 black
 flake8

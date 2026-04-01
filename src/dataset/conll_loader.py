@@ -212,6 +212,11 @@ class PrescriptionDataset(Dataset):
             # First subword of a word gets the label
             elif word_idx != previous_word_idx:
                 label = labels[word_idx]
+                if label not in self.label_map:
+                    logger.warning(
+                        f"Unknown label '{label}' not in label_map — defaulting to 'O'. "
+                        f"Check your CoNLL data for typos."
+                    )
                 label_id = self.label_map.get(label, 0)  # Default to 'O' (0)
                 aligned_labels.append(label_id)
             

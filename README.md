@@ -1,90 +1,66 @@
-Here is your complete **README.md file** in proper Markdown format.
-You can copy this directly into your `README.md` file in GitHub.
-
----
-
-```markdown
 # 📄 Prescription Reader
 
-An AI-powered **Prescription Reader System** that extracts text from medical prescriptions using **OCR (Optical Character Recognition)** and processes it using **NLP techniques** to generate structured medical information.
+An AI-powered **Prescription Reader System** that extracts text from medical prescriptions using **OCR (Optical Character Recognition)** and processes it using a fine-tuned **BioBERT NER model** to generate structured medical information and automatically fetch context for prescribed medicines.
 
 ---
 
 ## 🚀 Project Overview
 
-Medical prescriptions are often handwritten and difficult to interpret.  
-This project aims to:
-
-- 📸 Extract text from prescription images  
-- 🧠 Improve recognition of handwritten medical text  
-- 💊 Identify medicine names, dosage, and frequency  
-- 📊 Convert unstructured prescription text into structured data  
-
-This system can be used in:
-
-- Hospitals  
-- Pharmacies  
-- Medical record digitization  
-- Healthcare automation systems  
-
----
-
-## 🏗️ Project Architecture
-Input Image
-    ↓
-Image Preprocessing
-    ↓
-OCR Engine (Text Extraction)
-    ↓
-Text Cleaning & NLP Processing
-    ↓
-Medicine / Dosage Extraction
-    ↓
-Structured Output (JSON / CSV)
+Medical prescriptions are often handwritten and difficult to interpret. This system digitizes them with high accuracy by automating the extraction pipeline:
+- 📸 **OCR Extraction:** Digitizes handwritten/printed prescription texts via OCR (Sarvam AI).
+- 🧠 **NER Extraction:** Uses a fine-tuned BioBERT model designed specifically for medical Entity Recognition.
+- 💊 **Entity Detection:** Accurately identities `DRUG`, `DOSAGE`, `FREQUENCY`, and `DURATION` entities.
+- 📖 **Smart Drug Lookups:** Automatically queries Wikipedia to fetch medical descriptions for the exact medicine extracted.
+- 💻 **Interactive UI:** Provides a clean, modern web application via Streamlit.
 
 ---
 
 ## 🛠️ Technologies Used
 
 - **Python**
-- **OpenCV** – Image preprocessing
-- **Tesseract OCR / Google Vision API**
-- **NLP (spaCy / Regex / Custom Model)**
-- **Machine Learning (Optional for improvement)**
+- **Streamlit** – Web application interface
+- **Sarvam AI Vision API** – OCR Engine
+- **Hugging Face Transformers / PyTorch** – Fine-tuned `Bio_ClinicalBERT` model for NER
+- **Wikipedia API** – Automated drug/medication description lookup
 
 ---
 
 ## 📂 Project Structure
 
-```
-
+```text
 Prescription_Reader/
 │
-├── notebooks/           # Experimentation & model training
-├── src/                 # Core source code
-├── requirements.txt     # Project dependencies
-├── README.md            # Project documentation
-└── .gitignore
-
-````
+├── src/                 # Core source code (OCR, Preprocessing, NER Inference)
+├── models/              # Fine-tuned BioBERT model weights, cache & label maps
+├── notebooks/           # Jupyter notebooks for model training (Colab)
+├── data/                # Custom prescription dataset (CoNLL format)
+├── app.py               # Streamlit web application
+├── main.py              # Command-line testing script
+└── requirements.txt     # Python dependencies
+```
 
 ---
 
 ## ⚙️ Installation
 
-### 1️⃣ Clone the Repository
+### 1️⃣ Clone the Repository & Configure API Keys
 
 ```bash
 git clone https://github.com/kunalekare/Prescription_Reader.git
 cd Prescription_Reader
-````
+```
+*Note: Make sure to place your `SARVAM_API_KEY` inside a local `.env` file first.*
 
-### 2️⃣ Create Virtual Environment
+### 2️⃣ Create a Virtual Environment
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
+source venv/bin/activate
 ```
 
 ### 3️⃣ Install Dependencies
@@ -97,73 +73,23 @@ pip install -r requirements.txt
 
 ## ▶️ Usage
 
-### Step 1: Provide Prescription Image
-
-Place the prescription image inside the project folder.
-
-### Step 2: Run OCR Script
-
+### 🌐 Option 1: The Web Interface (Recommended)
+Launch the interactive browser-based visual UI where you can easily upload images and view extracted data dynamically:
 ```bash
-python src/main.py
+streamlit run app.py
 ```
 
-### Step 3: Output
-
-The system will generate:
-
-* Extracted text
-* Identified medicines
-* Dosage details
-* Structured output format
-
----
-
-## 🔍 Features
-
-✔ Handwritten Prescription OCR
-✔ Text Preprocessing
-✔ Medicine Name Detection
-✔ Dosage & Frequency Extraction
-✔ Structured Data Output
-
----
-
-## 📊 Future Improvements
-
-* Train custom OCR model for medical handwriting
-* Improve accuracy using Transformer-based NLP
-* Add Web Interface (Flask / FastAPI)
-* Integrate with Hospital Management System
-* Deploy using Docker / Cloud
-
----
-
-## 🎯 Challenges
-
-* Poor handwriting recognition
-* Abbreviations in prescriptions
-* Medical terminology variations
-* Image noise and blur
-
----
-
-## 📈 Expected Accuracy
-
-* Printed Text: High Accuracy
-* Handwritten Text: Moderate (Can improve with custom training)
+### 💻 Option 2: Command Line Interface
+To run a quick execution on a single prescription image straight from your terminal:
+```bash
+python main.py path/to/sample_prescription.jpg
+```
 
 ---
 
 ## 🤝 Contribution
-
-Contributions are welcome!
-
+Contributions to improve handwriting recognition or medicine mapping are welcome!
 1. Fork the repository
 2. Create a new branch
-3. Commit changes
-4. Submit Pull Request
-
----
-
-
-
+3. Commit your changes
+4. Submit a Pull Request

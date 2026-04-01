@@ -1,9 +1,18 @@
 """
-Training module for fine-tuning BioBERT on prescription NER data.
+Training module for fine-tuning Bio_ClinicalBERT on prescription NER data.
 Implements training loop with validation, checkpointing, and early stopping.
+Supports fp16 mixed-precision training for Colab GPU (T4/A100).
 """
 
+import os
+import sys
+import json
+from pathlib import Path
+from typing import Dict, Optional, Tuple
+from datetime import datetime
+
 import torch
+from torch.cuda.amp import GradScaler, autocast
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from transformers import (
@@ -12,11 +21,6 @@ from transformers import (
     get_linear_schedule_with_warmup
 )
 from tqdm import tqdm
-import os
-from pathlib import Path
-from typing import Dict, Optional, Tuple
-import json
-from datetime import datetime
 
 from ..dataset.conll_loader import (
     load_conll_datasets,
@@ -110,12 +114,17 @@ class PrescriptionNERTrainer:
         # Set model name
         self.model_name = model_name or self.config.pretrained_model_name
         
-        # Set device
-        self.device = torch.device(
-            "cuda" if torch.cuda.is_available() and self.config.device == "cuda" 
-            else "cpu"
-        )
+        # Set device — auto-detect CUDA regardless of config string
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.info(f"Using device: {self.device}")
+
+        # fp16 scaler — only active when CUDA is available and fp16 is enabled
+        self.use_fp16 = getattr(self.config, 'fp16', False) and torch.cuda.is_available()
+        self.scaler = GradScaler() if self.use_fp16 else None
+        if self.use_fp16:
+            logger.info("Mixed precision (fp16) training ENABLED")
+        else:
+            logger.info("Mixed precision (fp16) training DISABLED")
         
         # Initialize components
         self.tokenizer = None
@@ -222,20 +231,24 @@ class PrescriptionNERTrainer:
                 logger.info(f"Dev examples: {len(dev_dataset)}")
             
             # Create dataloaders
+            # num_workers=2 speeds up data loading on Colab/Linux; keep 0 on Windows
+            nw = 0 if sys.platform == "win32" else 2
             train_loader = DataLoader(
                 train_dataset,
                 batch_size=batch_size,
                 shuffle=True,
-                num_workers=0  # Windows compatibility
+                num_workers=nw,
+                pin_memory=torch.cuda.is_available()
             )
-            
+
             dev_loader = None
             if dev_dataset:
                 dev_loader = DataLoader(
                     dev_dataset,
                     batch_size=batch_size,
                     shuffle=False,
-                    num_workers=0
+                    num_workers=nw,
+                    pin_memory=torch.cuda.is_available()
                 )
             
             # Setup optimizer and scheduler
@@ -329,47 +342,54 @@ class PrescriptionNERTrainer:
         optimizer,
         scheduler
     ) -> float:
-        """Train for one epoch."""
+        """Train for one epoch with optional fp16 mixed precision."""
         self.model.train()
         total_loss = 0
-        
+
         progress_bar = tqdm(train_loader, desc="Training")
-        
+
         for step, batch in enumerate(progress_bar):
             # Move batch to device
             batch = {k: v.to(self.device) for k, v in batch.items()}
-            
-            # Forward pass
-            outputs = self.model(**batch)
-            loss = outputs.loss
-            
-            # Backward pass
-            loss.backward()
-            
-            # Gradient clipping
-            torch.nn.utils.clip_grad_norm_(
-                self.model.parameters(),
-                self.config.max_grad_norm
-            )
-            
-            # Update weights
-            optimizer.step()
+
+            # Forward pass (with or without fp16)
+            if self.use_fp16:
+                with autocast():
+                    outputs = self.model(**batch)
+                    loss = outputs.loss
+                # Backward pass with scaler
+                self.scaler.scale(loss).backward()
+                self.scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(
+                    self.model.parameters(), self.config.max_grad_norm
+                )
+                self.scaler.step(optimizer)
+                self.scaler.update()
+            else:
+                outputs = self.model(**batch)
+                loss = outputs.loss
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(
+                    self.model.parameters(), self.config.max_grad_norm
+                )
+                optimizer.step()
+
             scheduler.step()
             optimizer.zero_grad()
-            
+
             # Update metrics
             total_loss += loss.item()
             self.global_step += 1
-            
+
             # Update progress bar
             progress_bar.set_postfix({'loss': loss.item()})
-            
+
             # Log periodically
             if self.global_step % self.config.logging_steps == 0:
                 current_lr = scheduler.get_last_lr()[0]
                 self.training_history['learning_rates'].append(current_lr)
                 logger.debug(f"Step {self.global_step}: loss={loss.item():.4f}, lr={current_lr:.2e}")
-        
+
         return total_loss / len(train_loader)
     
     def _validate_epoch(self, dev_loader: DataLoader) -> float:
