@@ -290,16 +290,17 @@ def process_prescription(
         cleaned_text = clean_text(raw_text)
         
         # Step 3: NER prediction
-        logger.info("Step 3: Extracting entities with BioBERT...")
-        predictor = get_predictor()
-        token_predictions = predictor.predict_entities(cleaned_text)
+        logger.info("Step 3: Skipping NER (model not available)...")
+
+        token_predictions = []
+        entities = {}
         
         # Step 4: Extract structured entities
-        logger.info("Step 4: Structuring entities...")
-        entities = predictor.extract_entities(token_predictions)
+        logger.info("Step 4: Skipped")
+        
         
         # Step 5: Fetch drug descriptions
-        logger.info("Step 5: Fetching drug descriptions...")
+        logger.info("Step 5: Skipped")
         drug_descriptions = {}
         
         # Look for any drug entities
